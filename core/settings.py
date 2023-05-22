@@ -39,10 +39,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    "django.contrib.gis",
+
     'rest_framework',
 
     'users',
 ]
+
+AUTH_USER_MODEL = 'users.models'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

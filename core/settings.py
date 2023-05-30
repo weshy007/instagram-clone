@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     #Apps 
     'posts',
     'notifications',
+    'comments',
 
 ]
 

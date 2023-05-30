@@ -5,10 +5,7 @@ name = "pypi"
 
 [packages]
 psycopg2 = "*"
-django-debug-toolbar = "*"
 django = "*"
-djangorestframework = "*"
-celery = "*"
 python-decouple = "*"
 django-crispy-forms = "*"
 pillow = "*"

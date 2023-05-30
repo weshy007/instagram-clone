@@ -10,7 +10,7 @@ class Notification(models.Model):
         (3, 'Follow'),
     )
 
-    posts = models.ForeignKey("post.Post", on_delete=models.CASCADE, related_name='notification_post', null=True)
+    posts = models.ForeignKey("posts.Post", on_delete=models.CASCADE, related_name='notification_post', null=True)
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notification_from_user')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notification_to_user')
     notifications_types = models.IntegerField(choices=NOTIFICATION_TYPES, null=True, blank=True)

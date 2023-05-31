@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect
-import imp
 
 from .models import Notification
 

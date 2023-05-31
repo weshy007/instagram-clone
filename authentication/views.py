@@ -1,3 +1,5 @@
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
@@ -11,11 +13,8 @@ from comments.models import Comment
 from posts.forms import NewPostForm
 from posts.models import Follow, Likes, Post, Stream, Tag
 
+from .forms import EditProfileForm, UserRegisterForm
 from .models import Profile
-from .forms import UserRegisterForm
-from django.contrib import messages
-from django.contrib.auth import authenticate, login
-
 
 
 # Create your views here.
@@ -88,7 +87,30 @@ def user_profile(request, username):
 
 
 def edit_profile(request):
-    pass
+    user = request.user.id
+    profile = Profile.objects.get(user__id=user)
+
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, request.FILES, instance=request.user.profile)
+
+        if form.is_valid():
+            profile.image = form.cleaned_data.get('image')
+            profile.first_name = form.cleaned_data.get('first_name')
+            profile.last_name = form.cleaned_data.get('last_name')
+            profile.location = form.cleaned_data.get('location')
+            profile.url = form.cleaned_data.get('url')
+            profile.bio = form.cleaned_data.get('bio')
+            profile.save()
+
+            return redirect('profile', profile.user.username)
+        else:
+            form = EditProfileForm(instance=request.user.profile)
+
+        context = {
+            'form': form,
+        }
+
+        return render(request, 'edit_profile.html', context)
 
 
 def follow(request):

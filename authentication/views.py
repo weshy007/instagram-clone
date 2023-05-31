@@ -1,18 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-from django.db import transaction
-from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import resolve, reverse
 
-from comments.forms import NewCommentForm
-from comments.models import Comment
-from posts.forms import NewPostForm
-from posts.models import Follow, Likes, Post, Stream, Tag
+from posts.models import Follow, Post, Stream
 
 from .forms import EditProfileForm, UserRegisterForm
 from .models import Profile
@@ -29,12 +23,12 @@ def register(request):
             messages.success(request, f'Hurray, your account was created!!')
 
             # Auto Login
-            new_user = authenticate(username=username,password=password)
+            new_user = authenticate(username=username, password=password)
             login(request, new_user)
 
             return redirect('index')
         else:
-        # Handle form validation errors
+            # Handle form validation errors
             error_messages = form.errors.get_json_data(escape_html=False)
             for field, errors in error_messages.items():
                 for error in errors:
@@ -48,7 +42,6 @@ def register(request):
         'form': form,
     }
     return render(request, 'sign_up.html', context)
-
 
 
 def user_profile(request, username):

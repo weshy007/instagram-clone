@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     
     #Apps 
+    'authentication',
     'posts',
     'notifications',
     'comments',

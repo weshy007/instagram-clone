@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     # Profile
     path('profile/edit', views.edit_profile, name="editprofile"),
+    path('profile/<str:username>/', views.user_profile, name='profile'),
 
     # Authentication
     path('sign-up/', views.register, name="sign-up"),

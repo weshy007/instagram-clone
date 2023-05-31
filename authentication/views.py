@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+from django.db import transaction
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
@@ -113,5 +114,22 @@ def edit_profile(request):
         return render(request, 'edit_profile.html', context)
 
 
-def follow(request):
-    pass
+def follow(request, username, option):
+    user = request.user
+    following = get_object_or_404(User, username=username)
+
+    try:
+        if int(option) == 0:
+            Follow.objects.filter(follower=user, following=following).delete()
+            Stream.objects.filter(following=following, user=user).delete()
+        else:
+            posts = Post.objects.filter(user=following)[:25]
+            streams = [
+                    Stream(post=post, user=user, date=post.posted, following=following)
+                    for post in posts
+                ]
+            Stream.objects.bulk_create(streams)
+
+        return HttpResponseRedirect(reverse('profile', args=[username]))
+    except User.DoesNotExist:
+        return HttpResponseRedirect(reverse('profile', args=[username]))

@@ -29,7 +29,6 @@ def index(request):
     query = request.GET.get('q')
     users_paginator = None
 
-
     if query:
         users = User.objects.filter(Q(username__icontains=query))
         paginator = Paginator(users, 6)
@@ -40,7 +39,31 @@ def index(request):
         'post_items': post_items,
         'follow_status': follow_status,
         'profile': profile,
-        'users_pagnator': users_paginator,
-}
-        
+        'users_paginator': users_paginator,
+    }
+
     return render(request, 'index.html', context)
+
+
+def post_detail(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    comments = Comment.objects.filter(post=post).order_by('-date')
+
+    if request.method == 'POST':
+        form = NewCommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.post = post
+            comment.user = request.user
+            comment.save()
+            return HttpResponseRedirect(reverse('post-details', args=[post.id]))
+    else:
+        form = NewCommentForm()
+
+        context = {
+            'post': post,
+            'form': form,
+            'comments': comments
+        }
+
+        return render(request, 'post_detail.html', context)

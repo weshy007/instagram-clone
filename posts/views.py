@@ -80,3 +80,32 @@ def tags(request, tag_slug):
     }
 
     return render(request, 'tag.html', context)
+
+
+@login_required
+def like(request, post_id):
+    post = Post.objects.get(id=post_id)
+    liked = Likes.objects.filter(user=request.user, post=post).count()
+
+    if not liked:
+        Likes.objects.create(user=request.user, post=post)
+        post.likes += 1
+    else:
+        Likes.objects.filter(user=request.user, post=post).delete()
+        post.likes -= 1
+
+    post.save()
+    return HttpResponseRedirect(reverse('post-details', args=[post_id]))
+
+
+@login_required
+def favourite(request, post_id):
+    post = get_object_or_404(Post, id=post_id)
+    profile = get_object_or_404(Profile, user=request.user)
+
+    if post in profile.favourite.all():
+        profile.favourite.remove(post)
+    else:
+        profile.favourite.add(post)
+
+    return HttpResponseRedirect(reverse('post-details', args=[post_id]))

@@ -96,15 +96,15 @@ def edit_profile(request):
             profile.bio = form.cleaned_data.get('bio')
             profile.save()
 
-            return redirect('profile', profile.user.username)
-        else:
-            form = EditProfileForm(instance=request.user.profile)
+        return redirect('profile', profile.user.username)
+    else:
+        form = EditProfileForm(instance=request.user.profile)
 
-        context = {
-            'form': form,
-        }
+    context = {
+        'form': form,
+    }
 
-        return render(request, 'edit_profile.html', context)
+    return render(request, 'edit_profile.html', context)
 
 
 def follow(request, username, option):

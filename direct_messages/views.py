@@ -32,7 +32,7 @@ def inbox(request):
         'profile': profile
     }
 
-    return render(request, 'direct/direct.html', context)
+    return render(request, 'directs/direct.html', context)
 
 
 def directs(request, username):
@@ -56,13 +56,14 @@ def directs(request, username):
 
 
 def send_directs(request):
-    if request.method == 'POST':
-        from_user = request.user
-        to_user_username = request.POST.get('to_user')
-        body = request.POST.get('body')
+    from_user = request.user
+    to_user_username = request.POST.get('to_user')
+    body = request.POST.get('body')
 
-        to_user = get_object_or_404(User, username=to_user_username)
+    if request.method == "POST":
+        to_user = User.objects.get(username=to_user_username)
         Message.sender_message(from_user, to_user, body)
+        return redirect('message')
         
     return redirect('message')
 
@@ -88,12 +89,11 @@ def user_search(request):
 
 def new_conversation(request, username):
     from_user = request.user
-    
+    body = ''
     try:
-        to_user = get_object_or_404(User, username=username)
-    except User.DoesNotExist:
+        to_user = User.objects.get(username=username)
+    except Exception as e:
         return redirect('search-users')
-    
     if from_user != to_user:
-        Message.sender_message(from_user, to_user, '')
+        Message.sender_message(from_user, to_user, body)
     return redirect('message')

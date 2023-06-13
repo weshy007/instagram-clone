@@ -50,20 +50,20 @@ class Post(models.Model):
 
 class Likes(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_likes')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_likes')
 
-    def user_liked_post(self, sender, instance, *args, **kwargs):
+    def user_liked_post(sender, instance, *args, **kwargs):
         like = instance
         post = like.post
         sender = like.user
-        notify = Notification(post=post, sender=sender, user=post.user)
+        notify = Notification(posts=post, sender=sender, user=post.user)
         notify.save()
 
-    def user_unliked_posts(self, instance, *args, **kwargs):
+    def user_unliked_posts(instance, *args, **kwargs):
         like = instance
         post = like.post
         sender = like.user
-        notify = Notification.objects.filter(post=post, sender=sender, notification_types=1)
+        notify = Notification.objects.filter(posts=post, sender=sender, notifications_types=1)
         notify.delete()
 
 
@@ -71,18 +71,18 @@ class Follow(models.Model):
     follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower')
     following = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')
 
-    def user_follow(self, sender, instance, *args, **kwargs):
+    def user_follow(sender, instance, *args, **kwargs):
         follow = instance
         sender = follow.follower
         following = follow.following
-        notify = Notification(sender=sender, user=following, notification_types=3)
+        notify = Notification(sender=sender, user=following, notifications_types=3)
         notify.save()
 
-    def user_unfollow(self, sender, instance, *args, **kwargs):
+    def user_unfollow(sender, instance, *args, **kwargs):
         follow = instance
         sender = follow.follower
         following = follow.following
-        notify = Notification.objects.filter(sender=sender, user=following, notification_types=3)
+        notify = Notification.objects.filter(sender=sender, user=following, notifications_types=3)
         notify.delete()
 
 

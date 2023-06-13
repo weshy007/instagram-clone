@@ -1,8 +1,11 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.models import User
+from django.shortcuts import get_object_or_404, render, redirect
+from django.db.models import Q
+from django.core.paginator import Paginator
 
-from direct_messages.models import Message
 from authentication.models import Profile
+from direct_messages.models import Message
 
 
 # Create your views here.
@@ -40,7 +43,7 @@ def directs(request, username):
     directs.update(is_read = True)
 
     for message in messages:
-        if message['user'].username ==username:
+        if message['user'].username == username:
             message['unread'] = 0
 
     context = {
@@ -53,11 +56,34 @@ def directs(request, username):
 
 
 def send_directs(request):
-    pass
+    if request.method == 'POST':
+        from_user = request.user
+        to_user_username = request.POST.get('to_user')
+        body = request.POST.get('body')
+
+        to_user = get_object_or_404(User, username=to_user_username)
+        Message.sender_message(from_user, to_user, body)
+        
+    return redirect('message')
 
 
 def user_search(request):
-    pass
+    query = request.GET.get('q')
+    context = {}
+
+    if query:
+        users = User.objects.filter(username__icontains=query)
+
+        #Paginator
+        paginator = Paginator(users, 8)
+        page_number = request.GET.get('page')
+        users_paginator = paginator.get_page(page_number)
+
+        context = {
+            'users': users_paginator
+        }
+    
+    return render(request, 'directs/search.html', context)
 
 
 def new_conversation(request):

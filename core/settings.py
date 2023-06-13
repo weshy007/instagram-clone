@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'posts',
     'notifications',
     'comments',
+    'direct_messages',
 
 ]
 

@@ -9,7 +9,7 @@ from posts.models import Post
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="profile_picture", null=True, default="static/default.png")
+    image = models.ImageField(upload_to="profile_picture", null=True, default="media/default.png")
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
     bio = models.CharField(max_length=255, null=True, blank=True)

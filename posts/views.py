@@ -3,13 +3,14 @@ from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 
 from authentication.models import Profile
 from comments.forms import NewCommentForm
 from comments.models import Comment
 
+from .forms import NewPostForm
 from .models import Follow, Likes, Post, Stream, Tag
 
 
@@ -41,6 +42,37 @@ def index(request):
     }
 
     return render(request, 'index.html', context)
+
+
+def new_post(request):
+    user = request.user
+    profile = get_object_or_404(Profile, user=user)
+    tags_obj = []
+
+    if request.method == 'POST':
+        form = NewPostForm(request.POST, request.FILES)
+        if form.is_valid():
+            picture = form.cleaned_data.get('picture')
+            caption = form.cleaned_data.get('caption')
+            tag_form = form.cleaned_data.get('tags')
+            tag_list = list(tag_form.split(','))
+
+            for tag in tag_list:
+                t, created = Tag.objects.get_or_create(title=tag)
+                tags_obj.append(t)
+            p, created = Post.objects.get_or_create(picture=picture, caption=caption, user=user)
+            p.tags.set(tags_obj)
+            p.save()
+
+            return redirect('profile', request.user.username)
+        else:
+            form = NewPostForm()
+
+        context = {
+            'form': form
+        }
+
+        return render(request, 'new_post.html', context)
 
 
 def post_detail(request, post_id):

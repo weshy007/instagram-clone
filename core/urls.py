@@ -17,8 +17,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from authentication.views import user_profile, follow
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('users/', include('authentication.urls')),
+
+    # Apps urls
     path('', include('posts.urls')),
+    path('users/', include('authentication.urls')),
+    path('notifications', include('notifications.urls')),
+    path('message', include('direct_messages.urls')),
+
+    #Profile urls
+    path('<username>/', user_profile, name='profile'),
+    path('<username>/saved/', user_profile, name='profilefavourite'),
+    path('<username>/follow/<option>/', follow, name='follow'),
 ]

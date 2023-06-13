@@ -86,5 +86,14 @@ def user_search(request):
     return render(request, 'directs/search.html', context)
 
 
-def new_conversation(request):
-    pass
+def new_conversation(request, username):
+    from_user = request.user
+    
+    try:
+        to_user = get_object_or_404(User, username=username)
+    except User.DoesNotExist:
+        return redirect('search-users')
+    
+    if from_user != to_user:
+        Message.sender_message(from_user, to_user, '')
+    return redirect('message')

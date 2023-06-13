@@ -92,7 +92,7 @@ class Stream(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True)
     date = models.DateTimeField()
 
-    def add_post(self, sender, instance, *args, **kwargs):
+    def add_post(sender, instance, *args, **kwargs):
         post = instance
         user = post.user
         followers = Follow.objects.all().filter(following=user)

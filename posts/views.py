@@ -45,34 +45,31 @@ def index(request):
 
 
 def new_post(request):
-    user = request.user
-    profile = get_object_or_404(Profile, user=user)
-    tags_obj = []
-
     if request.method == 'POST':
         form = NewPostForm(request.POST, request.FILES)
         if form.is_valid():
             picture = form.cleaned_data.get('picture')
             caption = form.cleaned_data.get('caption')
             tag_form = form.cleaned_data.get('tags')
-            tag_list = list(tag_form.split(','))
+            tag_list = [tag.strip() for tag in tag_form.split(',') if tag.strip()]  # Remove leading/trailing spaces and exclude empty tags
 
+            tags_obj = []
             for tag in tag_list:
                 t, created = Tag.objects.get_or_create(title=tag)
                 tags_obj.append(t)
-            p, created = Post.objects.get_or_create(picture=picture, caption=caption, user=user)
-            p.tags.set(tags_obj)
-            p.save()
 
-            return redirect('profile', request.user.username)
-        else:
-            form = NewPostForm()
+            post = Post.objects.create(picture=picture, caption=caption, user=request.user)
+            post.tags.set(tags_obj)
 
-        context = {
-            'form': form
-        }
+            return redirect('profile', username=request.user.username)
+    else:
+        form = NewPostForm()
 
-        return render(request, 'new_post.html', context)
+    context = {
+        'form': form
+    }
+
+    return render(request, 'new_post.html', context)
 
 
 def post_detail(request, post_id):
